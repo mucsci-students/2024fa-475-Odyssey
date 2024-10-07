@@ -13465,7 +13465,7 @@ GameObject:
   - component: {fileID: 619394801}
   m_Layer: 0
   m_Name: Global Light 2D
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13630,12 +13630,12 @@ GameObject:
   - component: {fileID: 768790493}
   - component: {fileID: 768790492}
   - component: {fileID: 768790491}
-  - component: {fileID: 768790490}
   - component: {fileID: 768790489}
   - component: {fileID: 768790494}
+  - component: {fileID: 768790495}
   m_Layer: 0
   m_Name: Enemy2Spritesheet_0
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -13659,33 +13659,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   health: 2
---- !u!50 &768790490
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 768790488}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!95 &768790491
 Animator:
   serializedVersion: 5
@@ -13809,6 +13782,33 @@ CapsuleCollider2D:
   m_Offset: {x: -0.0024635445, y: -0.0245935}
   m_Size: {x: 0.7683917, y: 0.9068502}
   m_Direction: 0
+--- !u!50 &768790495
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 768790488}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 4
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0.5
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &905352641
 GameObject:
   m_ObjectHideFlags: 0
@@ -15074,7 +15074,7 @@ GameObject:
   - component: {fileID: 2088957533}
   m_Layer: 0
   m_Name: Diver
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
