@@ -1,7 +1,7 @@
 // Underwater Odyssey
 // Enemy Behavior (Movement) Script
 // Tim King
-// Modified: 9/30/2024
+// Modified: 10/1/2024
 
 using System.Collections;
 using System.Collections.Generic;
@@ -14,8 +14,6 @@ public class EnemyBehavior : MonoBehaviour
     public float verticalSpeed = 2f;  // Speed of random vertical movement
     public float verticalChangeInterval = 1f;
     public LayerMask groundLayer;
-
-    public float health;
 
     private Rigidbody2D rb;
     private float randomYDirection;
