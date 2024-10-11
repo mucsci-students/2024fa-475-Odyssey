@@ -1,101 +1,69 @@
 // Underwater Odyssey
 // Enemy Behavior (Movement) Script
 // Tim King
-// Modified: 9/30/2024
+// Modified: 10/07/2024
+
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class EnemyBehavior : MonoBehaviour
 {
     // VARIABLES
     public float moveSpeed = 5f;
-    public float verticalSpeed = 2f;  // Speed of random vertical movement
-    public float verticalChangeInterval = 1f;
-    public LayerMask groundLayer;
+    public float wakeDistace = 22f;
 
-    public float health;
 
     private Rigidbody2D rb;
-    private float randomYDirection;
-    private float timer;
-    private bool isGrounded;
-
     private GameObject player;  // Reference to the player GameObject
+    private bool awake;
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0; // Disable default gravity
-        SetRandomYDirection();
+        rb.freezeRotation = true; // Prevents enemy from spinning upon collision
         gameObject.tag = "Enemy";
         player = GameObject.FindWithTag("Player");
+        awake = false;
     }
+
 
     // Update is called once per frame
     void Update()
     {
-        // Determine the horizontal movement direction based on the enemy's position relative to the player
-        float horizontalDirection = (transform.position.x < player.transform.position.x) ? moveSpeed : -moveSpeed;
+        if (!awake) {
+            checkAwake();
+        } else {
+            // Determine the horizontal movement direction based on the enemy's position relative to the player
+            float horizontalDirection = (transform.position.x < player.transform.position.x) ? moveSpeed : -moveSpeed;
 
-        // Check if the enemy is grounded
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, 0.1f, groundLayer);
 
-        // Update vertical movement only if not grounded
-        if (!isGrounded)
-        {
+            // Determine the vertical movement direction based on the enemy's position relative to the player
+            float verticalDirection = (transform.position.y < player.transform.position.y) ? moveSpeed : -moveSpeed;
+           
             // Apply movement to the enemy
-            Vector2 movement = new Vector2(horizontalDirection, randomYDirection) * Time.deltaTime;
-            rb.MovePosition(rb.position + movement);
-            
-            // Adjust the timer for random vertical movement
-            timer += Time.deltaTime;
-            if (timer >= verticalChangeInterval)
-            {
-                SetRandomYDirection();
-                timer = 0f;
-            }
-        }
-        else
-        {
-            // Stop vertical movement if grounded
-            randomYDirection = 0; 
-            // Apply horizontal movement even if grounded
-            Vector2 movement = new Vector2(horizontalDirection, randomYDirection) * Time.deltaTime;
+            Vector2 movement = new Vector2(horizontalDirection, verticalDirection) * Time.deltaTime;
             rb.MovePosition(rb.position + movement);
         }
     }
 
-    // Function to randomly change vertical movement direction
-    void SetRandomYDirection()
-    {
-        randomYDirection = Random.Range(-verticalSpeed, verticalSpeed);  // Random up or down movement
-    }
 
-    // Collision detection to check if enemy touches the ground
-    private void OnCollisionEnter2D(Collision2D collision)
+    // Checks if the enemy has been awaken by the player
+    void checkAwake()
     {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;  // Mark as grounded when it touches the ground
-        }
-    }
+        // Calculate the distance between the enemy and the player
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
 
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;
-        }
-    }
 
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
+        // Check if the distance is less than or equal to wakeDistance
+        if (distanceToPlayer <= wakeDistace)
         {
-            isGrounded = false;  // No longer grounded when it leaves the ground
+            awake = true;  // Wake the enemy
         }
     }
 }
