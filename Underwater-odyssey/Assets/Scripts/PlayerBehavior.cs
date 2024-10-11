@@ -22,14 +22,16 @@ public class Behavior : MonoBehaviour
 
 
     private bool facingRight = true;
-
+    private Animator anim;
 
     void Start()
     {
+        anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0; // Disable default gravity
         gameObject.tag = "Player";
     }
+
 
 
     void Update()
@@ -68,6 +70,7 @@ public class Behavior : MonoBehaviour
         {
             FlipCharacter();
         }
+        anim.SetInteger("Speed",Mathf.Abs((int)rb.velocity.x));
     }
 
 
