@@ -42,6 +42,7 @@ public class Behavior : MonoBehaviour
 
 
         // If the player presses the "up" key or is already moving upward
+        if(!PauseMenu.isPaused){
         if (movement.y > 0)
         {
             // Allow upward movement even if touching the ground
@@ -71,6 +72,7 @@ public class Behavior : MonoBehaviour
             FlipCharacter();
         }
         anim.SetInteger("Speed",Mathf.Abs((int)rb.velocity.x));
+        }
     }
 
 
