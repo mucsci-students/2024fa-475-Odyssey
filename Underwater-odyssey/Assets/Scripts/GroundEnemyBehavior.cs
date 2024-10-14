@@ -1,13 +1,8 @@
-// Underwater Odyssey
-// Enemy Fight Script
-// Tim King
-// Modified: 10/07/2024
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyBehavior : MonoBehaviour
+public class GroundEnemyBehavior : MonoBehaviour
 {
     // Movement Variables
     public float moveSpeed = 5f;
@@ -22,16 +17,17 @@ public class EnemyBehavior : MonoBehaviour
 
     private Rigidbody2D rb;
     private GameObject player;  // Reference to the player GameObject
-    private bool awake;
-    private bool inContact;
+    private bool awake;         // Whether the enemy is awake
+    private bool inContact;     // Whether the enemy is in contact with the player
     public FloatingHealthBar healthBar; // Reference to the health bar
 
-    private bool facingRight = false;
+    private bool facingRight = false;   // Tracks which way the enemy is facing
+    private bool isGrounded = false;    // Checks if the enemy is on the ground
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 0; // Disable default gravity
+        rb.gravityScale = 1; // Enable gravity so the enemy stays on the ground
         rb.freezeRotation = true; // Prevents enemy from spinning upon collision
         gameObject.tag = "Enemy";
         player = GameObject.FindWithTag("Player");
@@ -47,7 +43,7 @@ public class EnemyBehavior : MonoBehaviour
         {
             CheckAwake();
         }
-        else
+        else if (isGrounded) // Only move if the enemy is grounded
         {
             MoveTowardsPlayer();
             if (inContact && cooldown <= 0f)
@@ -78,7 +74,6 @@ public class EnemyBehavior : MonoBehaviour
         transform.localScale = scale;
     }
 
-
     void CheckAwake()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
@@ -91,21 +86,30 @@ public class EnemyBehavior : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
-        Vector2 direction = (player.transform.position - transform.position).normalized;
-        rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
+        Vector2 direction = (player.transform.position - transform.position);
+        direction.y = 0; // Only move horizontally
 
-        if (direction.x > 0 && !facingRight) FlipCharacter();
-        else if (direction.x < 0 && facingRight) FlipCharacter();
+        rb.MovePosition(rb.position + direction.normalized * moveSpeed * Time.deltaTime);
+
+        // Flip the character if needed based on movement direction
+        if (direction.x > 0 && !facingRight)
+        {
+            FlipCharacter();
+        }
+        else if (direction.x < 0 && facingRight)
+        {
+            FlipCharacter();
+        }
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damageAmount)
     {
-        currentHealth -= damage;
+        currentHealth -= damageAmount;
         healthBar.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
-        if (currentHealth <= 0){
+        if (currentHealth <= 0)
+        {
             HandleDeath();
         }
-        
     }
 
     private void HandleDeath()
@@ -115,6 +119,13 @@ public class EnemyBehavior : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        // Check if the enemy is on the ground
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true; // The enemy is grounded
+        }
+
+        // Handle collision with player for attack
         if (collision.gameObject.CompareTag("Player"))
         {
             inContact = true; // Set the boolean to true when colliding with the player
@@ -123,6 +134,13 @@ public class EnemyBehavior : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D collision)
     {
+        // Check if the enemy has left the ground
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false; // The enemy is no longer grounded
+        }
+
+        // Handle exiting collision with the player
         if (collision.gameObject.CompareTag("Player"))
         {
             inContact = false; // Set the boolean to false when leaving the enemy
@@ -138,9 +156,9 @@ public class EnemyBehavior : MonoBehaviour
         PlayerBehavior target = player.GetComponent<PlayerBehavior>();
         if (target != null)
         {
-            target.currentHealth -= damage; // Apply damage to the player
+            target.TakeDamage(damage); // Apply damage to the player
         }
-        
+
         cooldown = 2f; // Reset cooldown
     }
 }

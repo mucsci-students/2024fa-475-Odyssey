@@ -1,3 +1,8 @@
+/*
+Author: Mia Joseph
+Handles camera movements
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

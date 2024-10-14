@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PlayerBehavior : MonoBehaviour
 {
@@ -30,6 +31,9 @@ public class PlayerBehavior : MonoBehaviour
     private GameObject currentEnemy;  // Store reference to the current enemy
    // public FloatingHealthBar healthBar; // Reference to the health bar
 
+   public int coinCount = 0;
+   public TextMeshProUGUI coinText;
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -38,7 +42,7 @@ public class PlayerBehavior : MonoBehaviour
         gameObject.tag = "Player";
         inContact = false; // Initially not in contact with any enemy
         //healthBar.UpdateHealthBar(currentHealth, maxHealth); // Initialize health bar
-        
+        UpdateCoinUI();
     }
 
     void Update()
@@ -66,6 +70,17 @@ public class PlayerBehavior : MonoBehaviour
         {
             HandleDeath();
         }
+    }
+
+    public void CollectCoin()
+    {
+        coinCount++;
+        UpdateCoinUI();
+    }
+
+    void UpdateCoinUI()
+    {
+        coinText.text = "Coins: x" + coinCount.ToString();
     }
 
     private void HandleInput()
