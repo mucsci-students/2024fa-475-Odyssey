@@ -77,4 +77,3 @@ public class PlayerFight : MonoBehaviour
         enemy.health -= damage;
     }
 }
-

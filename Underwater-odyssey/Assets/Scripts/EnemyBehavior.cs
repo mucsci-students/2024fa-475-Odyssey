@@ -1,27 +1,31 @@
 // Underwater Odyssey
-// Enemy Behavior (Movement) Script
+// Enemy Fight Script
 // Tim King
 // Modified: 10/07/2024
-
 
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class EnemyBehavior : MonoBehaviour
 {
-    // VARIABLES
+    // Movement Variables
     public float moveSpeed = 5f;
-    public float wakeDistace = 22f;
+    public float wakeDistance = 22f;
+    public float maxHealth = 10f;
+    public float currentHealth;
+    public float damage = 2f; // Damage dealt to the player
 
+    // Attack Variables
+    public GameObject attackParticlesPrefab;
+    private float cooldown = 2f; // Time between attacks
 
     private Rigidbody2D rb;
     private GameObject player;  // Reference to the player GameObject
     private bool awake;
+    private bool inContact;
+    public FloatingHealthBar healthBar; // Reference to the health bar
 
-
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -30,40 +34,98 @@ public class EnemyBehavior : MonoBehaviour
         gameObject.tag = "Enemy";
         player = GameObject.FindWithTag("Player");
         awake = false;
+        inContact = false;
+        currentHealth = maxHealth; // Initialize current health
+        healthBar.UpdateHealthBar(currentHealth, maxHealth); // Initialize health bar
     }
 
-
-    // Update is called once per frame
     void Update()
     {
-        if (!awake) {
-            checkAwake();
-        } else {
-            // Determine the horizontal movement direction based on the enemy's position relative to the player
-            float horizontalDirection = (transform.position.x < player.transform.position.x) ? moveSpeed : -moveSpeed;
+        if (!awake)
+        {
+            CheckAwake();
+        }
+        else
+        {
+            MoveTowardsPlayer();
+            if (inContact && cooldown <= 0f)
+            {
+                Attack();
+            }
 
+            // Reduce cooldown
+            if (cooldown > 0)
+            {
+                cooldown -= Time.deltaTime;  // Decrease cooldown over time
+            }
+        }
 
-            // Determine the vertical movement direction based on the enemy's position relative to the player
-            float verticalDirection = (transform.position.y < player.transform.position.y) ? moveSpeed : -moveSpeed;
-           
-            // Apply movement to the enemy
-            Vector2 movement = new Vector2(horizontalDirection, verticalDirection) * Time.deltaTime;
-            rb.MovePosition(rb.position + movement);
+        // Check for enemy death
+        if (currentHealth <= 0)
+        {
+            HandleDeath();
         }
     }
 
-
-    // Checks if the enemy has been awaken by the player
-    void checkAwake()
+    void CheckAwake()
     {
-        // Calculate the distance between the enemy and the player
         float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
-
-
-        // Check if the distance is less than or equal to wakeDistance
-        if (distanceToPlayer <= wakeDistace)
+        if (distanceToPlayer <= wakeDistance)
         {
+            healthBar = GetComponentInChildren<FloatingHealthBar>();
             awake = true;  // Wake the enemy
         }
+    }
+
+    void MoveTowardsPlayer()
+    {
+        Vector2 direction = (player.transform.position - transform.position).normalized;
+        rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        healthBar.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
+        if (currentHealth <= 0){
+            HandleDeath();
+        }
+        
+    }
+
+    private void HandleDeath()
+    {
+        Destroy(gameObject); // Destroy the enemy object
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            inContact = true; // Set the boolean to true when colliding with the player
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            inContact = false; // Set the boolean to false when leaving the enemy
+        }
+    }
+
+    void Attack()
+    {
+        GameObject particles = Instantiate(attackParticlesPrefab, transform.position, transform.rotation);
+        Destroy(particles, 1.0f); // Destroy the particle system after 1 second
+
+        // Retrieve the PlayerBehavior component from the player
+        PlayerBehavior target = player.GetComponent<PlayerBehavior>();
+        if (target != null)
+        {
+            target.currentHealth -= damage; // Apply damage to the player
+        }
+        
+        cooldown = 2f; // Reset cooldown
     }
 }
