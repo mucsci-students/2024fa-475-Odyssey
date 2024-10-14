@@ -24,6 +24,8 @@ public class BossBehavior : MonoBehaviour
 
     private GameObject player;  // Reference to the player GameObject
 
+    private bool facingRight = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -65,8 +67,21 @@ public class BossBehavior : MonoBehaviour
             // Apply horizontal movement even if grounded
             Vector2 movement = new Vector2(horizontalDirection, randomYDirection) * Time.deltaTime;
             rb.MovePosition(rb.position + movement);
+
+            if (movement.x > 0 && !facingRight) FlipCharacter();
+            else if (movement.x < 0 && facingRight) FlipCharacter();
         }
     }
+
+    // Flip the character's sprite when changing direction
+    void FlipCharacter()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1; // Flip the sprite by inverting the x scale
+        transform.localScale = scale;
+    }
+
 
     // Function to randomly change vertical movement direction
     void SetRandomYDirection()

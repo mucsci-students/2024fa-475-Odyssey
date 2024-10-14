@@ -1,3 +1,8 @@
+/*
+Mia Joseph
+Script to collect coins
+*/
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
