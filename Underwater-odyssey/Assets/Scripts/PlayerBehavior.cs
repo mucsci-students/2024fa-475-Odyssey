@@ -21,15 +21,16 @@ public class PlayerBehavior : MonoBehaviour
     // Combat Variables
     public float damage;
     public GameObject attackParticlesPrefab;
+    public Gun gun;
 
     private Rigidbody2D rb;
-    private Vector2 movement;
+    Vector2 movement;
+    Vector2 mouse;
     private bool facingRight = true;
     private Animator anim;
 
     private bool inContact;
     private GameObject currentEnemy;  // Store reference to the current enemy
-   // public FloatingHealthBar healthBar; // Reference to the health bar
 
    public int coinCount = 0;
    public TextMeshProUGUI coinText;
@@ -41,12 +42,12 @@ public class PlayerBehavior : MonoBehaviour
         rb.gravityScale = 0; // Disable default gravity
         gameObject.tag = "Player";
         inContact = false; // Initially not in contact with any enemy
-        //healthBar.UpdateHealthBar(currentHealth, maxHealth); // Initialize health bar
         UpdateCoinUI();
     }
 
     void Update()
     {
+    mouse = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0));
         if (!PauseMenu.isPaused)
         {
             HandleInput();
@@ -65,7 +66,6 @@ public class PlayerBehavior : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
-       // healthBar.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
         if (currentHealth <= 0)
         {
             HandleDeath();
@@ -102,6 +102,8 @@ public class PlayerBehavior : MonoBehaviour
 
         // Apply horizontal movement
         rb.velocity = new Vector2(movement.x * moveSpeed, rb.velocity.y);
+        Vector2 aimDir = mouse - rb.position;    
+        float aimAngle = Mathf.Atan2(aimDir.y, aimDir.x) * Mathf.Rad2Deg - 90f; 
     }
 
     private void UpdateAnimation()
@@ -122,6 +124,9 @@ public class PlayerBehavior : MonoBehaviour
         if (inContact && Input.GetMouseButtonDown(0)) // Left mouse button
         {
             Attack();
+        }
+        else if (Input.GetMouseButtonDown(0)){
+            gun.Fire();
         }
     }
 

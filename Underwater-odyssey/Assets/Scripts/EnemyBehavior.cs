@@ -1,8 +1,3 @@
-// Underwater Odyssey
-// Enemy Fight Script
-// Tim King
-// Modified: 10/07/2024
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,7 +33,7 @@ public class EnemyBehavior : MonoBehaviour
         awake = false;
         inContact = false;
         currentHealth = maxHealth; // Initialize current health
-        healthBar.UpdateHealthBar(currentHealth, maxHealth); // Initialize health bar
+        UpdateHealthBar(); // Initialize health bar
     }
 
     void Update()
@@ -78,13 +73,11 @@ public class EnemyBehavior : MonoBehaviour
         transform.localScale = scale;
     }
 
-
     void CheckAwake()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
         if (distanceToPlayer <= wakeDistance)
         {
-            healthBar = GetComponentInChildren<FloatingHealthBar>();
             awake = true;  // Wake the enemy
         }
     }
@@ -101,11 +94,11 @@ public class EnemyBehavior : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
-        healthBar.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
-        if (currentHealth <= 0){
+        UpdateHealthBar(); // Update health bar
+        if (currentHealth <= 0)
+        {
             HandleDeath();
         }
-        
     }
 
     private void HandleDeath()
@@ -138,9 +131,14 @@ public class EnemyBehavior : MonoBehaviour
         PlayerBehavior target = player.GetComponent<PlayerBehavior>();
         if (target != null)
         {
-            target.currentHealth -= damage; // Apply damage to the player
+            target.TakeDamage(damage); // Apply damage to the player
         }
-        
+
         cooldown = 2f; // Reset cooldown
+    }
+
+    private void UpdateHealthBar()
+    {
+        healthBar.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
     }
 }
