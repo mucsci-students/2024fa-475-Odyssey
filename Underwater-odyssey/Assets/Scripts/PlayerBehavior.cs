@@ -22,6 +22,7 @@ public class PlayerBehavior : MonoBehaviour
     public float damage;
     public GameObject attackParticlesPrefab;
     public Gun gun;
+    public int harpoonAmount = 5;
 
     private Rigidbody2D rb;
     Vector2 movement;
@@ -31,9 +32,9 @@ public class PlayerBehavior : MonoBehaviour
 
     private bool inContact;
     private GameObject currentEnemy;  // Store reference to the current enemy
-
-   public int coinCount = 0;
-   public TextMeshProUGUI coinText;
+    public FloatingHealthBar healthBar;
+    public int coinCount = 0;
+    public TextMeshProUGUI coinText;
 
     void Start()
     {
@@ -43,6 +44,7 @@ public class PlayerBehavior : MonoBehaviour
         gameObject.tag = "Player";
         inContact = false; // Initially not in contact with any enemy
         UpdateCoinUI();
+        UpdateHealthBar();
     }
 
     void Update()
@@ -54,7 +56,7 @@ public class PlayerBehavior : MonoBehaviour
             HandleMovement();
             UpdateAnimation();
             HandleCombat();
-
+            
             // Check if the player is dead
             if (currentHealth <= 0)
             {
@@ -66,6 +68,7 @@ public class PlayerBehavior : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
+        UpdateHealthBar();
         if (currentHealth <= 0)
         {
             HandleDeath();
@@ -76,6 +79,10 @@ public class PlayerBehavior : MonoBehaviour
     {
         coinCount++;
         UpdateCoinUI();
+    }
+
+    public void increaseHarpoon(){
+        harpoonAmount++;
     }
 
     void UpdateCoinUI()
@@ -117,6 +124,7 @@ public class PlayerBehavior : MonoBehaviour
         Vector3 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
+        
     }
 
     private void HandleCombat()
@@ -126,7 +134,11 @@ public class PlayerBehavior : MonoBehaviour
             Attack();
         }
         else if (Input.GetMouseButtonDown(0)){
-            gun.Fire();
+            if (harpoonAmount > 0){
+                gun.Fire();
+                harpoonAmount--;
+            }
+            
         }
     }
 
@@ -169,5 +181,10 @@ public class PlayerBehavior : MonoBehaviour
 
         // Optionally: Show Game Over screen or reset level after a delay
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex -1);
+    }
+
+    private void UpdateHealthBar()
+    {
+        healthBar.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
     }
 }
