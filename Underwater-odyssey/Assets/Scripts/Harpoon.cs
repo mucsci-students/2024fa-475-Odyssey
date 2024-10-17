@@ -4,41 +4,63 @@ using UnityEngine;
 
 public class Harpoon : MonoBehaviour
 {
-    public float damage = 1f;
+    public float damage = 15f;
     private bool inContact;
     private GameObject currentEnemy;
-    private float cooldown = 10f;
+    private GameObject player;
+    private float cooldown = 0.5f; // Reasonable cooldown duration
+    private float lastDamageTime;
+    private bool didDamage = false;
 
+    private float lifespan = 2f; // Minimum lifespan before destruction
+    private float spawnTime; // Time when the harpoon was launched
 
-    public void OnCollisionEnter2D(Collision2D collision){
+    void Start()
+    {
+        // Record the time when the harpoon was created
+        spawnTime = Time.time;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            inContact = true; // Set the boolean to true when colliding with an enemy
+            inContact = true; // Set to true when colliding with an enemy
             currentEnemy = collision.gameObject;
         }
-    }
-    void Update(){
 
-        if (inContact) // Left mouse button
+        if (collision.gameObject.CompareTag("Player"))
         {
-            if (cooldown > 0)
-            {
-                cooldown -= Time.deltaTime;  // Decrease cooldown over time
+            player = collision.gameObject;
+            // Check if enough time has passed before destroying the harpoon
+            if (Time.time - spawnTime >= lifespan)
+            {   
+                PlayerBehavior curPlayer = player.GetComponent<PlayerBehavior>();
+                curPlayer.increaseHarpoon();
+                Destroy(gameObject); // Destroy the harpoon when the player comes into contact
             }
-        EnemyBehavior enemy = currentEnemy.GetComponent<EnemyBehavior>();
-        if (enemy != null)
+        }
+    }
+
+    void Update()
+    {
+        if (inContact && Time.time > lastDamageTime + cooldown && !didDamage) // Check if enough time has passed
         {
-            enemy.TakeDamage(damage); // Apply damage to the enemy
+            EnemyBehavior enemy = currentEnemy.GetComponent<EnemyBehavior>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage); // Apply damage to the enemy
+                didDamage = true;
+                lastDamageTime = Time.time; // Update the last damage time
+            }
         }
-        }
-        
     }
 
     void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            inContact = false; // Set the boolean to false when leaving the enemy
+            inContact = false; // Set to false when leaving the enemy
             currentEnemy = null;
         }
     }
