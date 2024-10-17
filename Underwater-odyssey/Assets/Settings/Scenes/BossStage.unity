@@ -5464,7 +5464,7 @@ MonoBehaviour:
   harpoonAmount: 5
   healthBar: {fileID: 1470596145}
   coinCount: 0
-  coinText: {fileID: 0}
+  coinText: {fileID: 1091723356}
 --- !u!95 &1719608728
 Animator:
   serializedVersion: 5
